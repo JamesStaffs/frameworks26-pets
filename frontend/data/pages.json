@@ -1,0 +1,22 @@
+[
+{
+"title": "About Us",
+"slug": "about-us",
+"content": "Welcome to our pet website. We love pets and want to share information about them."
+},
+{
+"title": "Contact Us",
+"slug": "contact-us",
+"content": "Please contact us if you would like more information about our pets."
+},
+{
+"title": "Our Services",
+"slug": "our-services",
+"content": "We provide pet information and support."
+},
+{
+"title": "Play the Game",
+"slug": "play-the-game",
+"content": "You lost the game."
+}
+]
