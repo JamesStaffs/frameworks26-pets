@@ -1,4 +1,5 @@
 import express, { type Express, type Request, type Response } from 'express'; 
+import { petSchema, petUpdateSchema } from './schemas/petSchema';
 
 const app: Express = express();
 app.use(express.static('public'));
@@ -22,7 +23,7 @@ let pets: AnimalType[] = [
         animalPic: "https://fi67.github.io/JsonData/images/falcor.jpg",
         animalAge: "15",
         animalType: "Dog",
-        animalBreed: "",
+        animalBreed: "Small Dog",
     },
     {
         animalID: 2,
@@ -75,6 +76,69 @@ app.get('/pets/:id', (req: Request, res: Response) => {
     });
 });
 
+app.patch('/pets/:id', (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+    
+    const petIndex = pets.findIndex((pet) => {
+        return pet.animalID == id;
+    });
+
+    if (petIndex === -1) {
+        return res.status(404).send({
+            error: true,
+            message: "Pet cannot be found with the specified ID"
+        });
+    }
+    const validation = petUpdateSchema.safeParse(req.body);
+
+    if (!validation.success) {
+        return res.status(400).json({
+            error: true,
+            message: 'Validation failed',
+            details: validation.error.issues
+        });
+    }
+
+    pets[petIndex] = {
+        ...pets[petIndex],
+        ...validation.data
+    };
+
+    res.send(pets[petIndex]);
+});
+
+app.put('/pets/:id', (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+    
+    const petIndex = pets.findIndex((pet) => {
+        return pet.animalID == id;
+    });
+
+    if (petIndex === -1) {
+        return res.status(404).send({
+            error: true,
+            message: "Pet cannot be found with the specified ID"
+        });
+    }
+
+    const validation = petSchema.safeParse(req.body);
+
+    if (!validation.success) {
+        return res.status(400).json({
+            error: true,
+            message: 'Validation failed',
+            details: validation.error.issues
+        });
+    }
+
+    pets[petIndex] = {
+        animalID: id,
+        ...validation.data
+    };
+
+    res.send(pets[petIndex]);
+});
+
 app.delete('/pets/:id', (req: Request, res: Response) => {
     const id = Number(req.params.id);
     pets = pets.filter((pet) => {
@@ -87,22 +151,24 @@ app.delete('/pets/:id', (req: Request, res: Response) => {
 });
 
 app.post('/pets', (req: Request, res: Response) => {
-    console.log(req.body);
-    
-    // TODO: validation
+    const validation = petSchema.safeParse(req.body);
+
+    if (!validation.success) {
+        return res.status(400).json({
+            error: true,
+            message: 'Validation failed',
+            details: validation.error.issues
+        });
+    }
 
     const pet: AnimalType = {
         animalID: pets.length + 1,
-        animalName: req.body.animalName,
-        animalType: req.body.animalType,
-        animalBreed: req.body.animalBreed,
-        animalAge: req.body.animalAge,
-        animalPic: req.body.animalPic,
+        ...validation.data
     };
-    console.log(pet);
 
     pets.push(pet);
-    res.send(pet);
+
+    return res.status(201).json(pet);
 });
 
 app.listen(port, () => { 
