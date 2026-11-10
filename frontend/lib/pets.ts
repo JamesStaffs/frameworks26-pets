@@ -15,32 +15,36 @@ export async function getAnimals(): Promise<AnimalType[]> {
             // next: { revalidate: 3600 }
         }
     );
+
     if (!res.ok) {
         throw new Error("Failed to fetch animals");
     }
+
     const animals: AnimalType[] = await res.json();
     return animals;
 }
 
-export async function getRandomAnimal():
-    Promise<AnimalType | undefined> {
+export async function getRandomAnimal(): Promise<AnimalType | undefined> {
     const animals = await getAnimals();
     if (animals.length === 0) {
         return undefined;
     }
+
     const randomIndex = Math.floor(
         Math.random() * animals.length
     );
+    
     return animals[randomIndex];
 }
 
-export async function getAnimalById(id: string): Promise<AnimalType
-    | undefined> {
+export async function getAnimalById(id: string): Promise<AnimalType | undefined> {
     const animals = await getAnimals();
+
     const numericId = Number(id);
     if (!Number.isInteger(numericId)) {
         return undefined;
     }
+
     return animals.find(
         (animal) => animal.animalID === numericId
     );
@@ -52,9 +56,8 @@ export function createSlug(name: string): string {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "");
 }
-export async function getAnimalBySlug(
-    slug: string
-): Promise<AnimalType | undefined> {
+
+export async function getAnimalBySlug(slug: string): Promise<AnimalType | undefined> {
     const animals = await getAnimals();
     return animals.find(
         (animal) => createSlug(animal.animalName) === slug

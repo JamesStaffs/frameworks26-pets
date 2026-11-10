@@ -48,7 +48,7 @@ app.get('/pets/search', (req: Request, res: Response) => {
     if(name == "undefined") {
         return res.status(400).send({
             error: true,
-            message: "Pet cannot be found with the specified ID"
+            message: "Pet cannot be found with the specified name"
         });
     }
 
